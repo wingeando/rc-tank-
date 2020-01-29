@@ -1,0 +1,116 @@
+int in1 = 11;
+int in2 = 12;
+int in13 = 8;
+int in24 = 9;
+
+//the following are all ~PWM capable ports 
+int enable1 = 10;
+int enable11 = 7;
+int rc_channel4 = 3;
+int rc_channel4a = 4;
+int switchD = 5;
+int switchDa = 6;
+
+void setup() {
+  pinMode(rc_channel4, INPUT);
+  pinMode(switchD, INPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(enable1, OUTPUT);
+  Serial.begin(9600);
+
+   pinMode(rc_channel4a, INPUT);
+  pinMode(switchDa, INPUT);
+  pinMode(in13, OUTPUT);
+  pinMode(in24, OUTPUT);
+  pinMode(enable11, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  
+  int pwm = 0;
+  int swd = pulseIn(switchD, HIGH, 25000);
+  int rc4 = pulseIn(rc_channel4, HIGH, 25000);
+
+   int pwma = 0;
+  int swda = pulseIn(switchDa, HIGH, 25000);
+  int rc4a = pulseIn(rc_channel4a, HIGH, 25000);
+  
+  Serial.print("switch: ");
+  Serial.print(swd);
+  Serial.print(" raw channel4: ");
+  Serial.print(rc4);
+
+   Serial.print("switcha: ");
+  Serial.print(swda);
+  Serial.print(" raw channel4a: ");
+  Serial.print(rc4a);
+  
+  if(rc4==0){
+      Serial.println(" no signal");
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, LOW);
+      analogWrite(enable1, 0);
+}
+     
+  else if(rc4 > 1530){ //right stick
+      pwm = map(rc4, 1530, 2000, 0, 255); //map our speed to 0-255 range
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, HIGH);
+      analogWrite(enable1, pwm);
+      Serial.print(" right stick speed: ");
+      Serial.println(pwm);
+  }
+  else if(rc4 < 1460){
+      pwm = map(rc4, 1400, 1000, 0, 255); //map our speed to 0-255 range
+      digitalWrite(in1, HIGH);
+      digitalWrite(in2, LOW);
+      analogWrite(enable1, pwm);
+      Serial.print(" left stick speed: ");
+      Serial.println(pwm);
+  }
+    else{
+      Serial.println(" stick centered");
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, LOW);
+      analogWrite(enable1, 0);
+  } 
+  delay(10);
+  
+      if(rc4a==0){
+      Serial.println(" no signal2");
+      digitalWrite(in13, LOW);
+      digitalWrite(in24, LOW);
+      analogWrite(enable11, 0);
+  }
+  
+ 
+  
+  else if(rc4a > 1530){ //right stick
+      pwma = map(rc4a, 1530, 2000, 0, 255); //map our speed to 0-255 range
+      digitalWrite(in13, LOW);
+      digitalWrite(in24, HIGH);
+      analogWrite(enable11, pwma);
+      Serial.print(" right stick speed2: ");
+      Serial.println(pwma);
+  }
+
+  
+  else if(rc4a < 1460){
+      pwma = map(rc4a, 1400, 1000, 0, 255); //map our speed to 0-255 range
+      digitalWrite(in13, HIGH);
+      digitalWrite(in24, LOW);
+      analogWrite(enable11, pwma);
+      Serial.print(" left stick speed2: ");
+      Serial.println(pwma);
+  }
+  
+  else{
+      Serial.println(" stick centered2");
+      digitalWrite(in13, LOW);
+      digitalWrite(in24, LOW);
+      analogWrite(enable11, 0);
+  }
+  delay(10);
+}
